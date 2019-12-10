@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -71,129 +73,215 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        backgroundColor: color,
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(15.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Container(
-              margin: EdgeInsets.all(8.0),
-              child: Text(
-                'Remplissez tous les champs pour obtenir votre besoin journalier en calories.',
-                textAlign: TextAlign.center,
-              ),
-            ),
-            Card(
-              elevation: 8.0,
-              child: Container(
-                height: MediaQuery
-                    .of(context)
-                    .size
-                    .height * 0.65,
-                width: MediaQuery
-                    .of(context)
-                    .size
-                    .width * 0.9,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: <Widget>[
-                        Text(
-                          'Femme',
-                          textAlign: TextAlign.center,
-                          style:
-                          TextStyle(color: (homme) ? Colors.black : color),
-                        ),
-                        Switch(
-                          value: homme,
-                          activeColor: Colors.blue,
-                          inactiveTrackColor: Colors.pink,
-                          inactiveThumbColor: Colors.pink,
-                          onChanged: (bool b) {
-                            setState(() {
-                              homme = b;
-                              (homme)
-                                  ? color = Colors.blue
-                                  : color = Colors.pink;
-                            });
-                          },
-                        ),
-                        Text(
-                          'Homme',
-                          textAlign: TextAlign.center,
-                          style:
-                          TextStyle(color: (homme) ? color : Colors.black),
-                        ),
-                      ],
-                    ),
-                    RaisedButton(
-                      color: color,
-                      child: Text(
-                        (date == null)
-                            ? "Date de naissance"
-                            : "Votre âge est de ${yourAge} ans",
-                        style: TextStyle(color: Colors.white),
-                      ),
-                      onPressed: birthDate,
-                    ),
-                    Text(
-                      "Votre taille est de ${tailleDouble.floor()}cm.",
-                      textAlign: TextAlign.center,
-                      style: TextStyle(color: color),
-                    ),
-                    Slider(
-                      value: tailleDouble,
-                      min: 130.0,
-                      max: 210.0,
-                      activeColor: color,
-                      onChanged: (double d) {
-                        setState(() {
-                          tailleDouble = d;
-                        });
-                      },
-                    ),
-                    TextField(
-                      keyboardType: TextInputType.number,
-                      onSubmitted: (String string) {
-                        setState(() {
-                          weight = double.parse(string);
-                          submitted = 'Votre poids est de ${string}kg.';
-                        });
-                      },
-                      decoration: InputDecoration(
-                          labelText: 'Entrez votre poids en kilos.'
-                      ),
-                    ),
-                    Text(
-                      submitted ?? '',
-                      style: TextStyle(color: color),
-                    ),
-                    Text(
-                        'Quelle est votre activité sportive ?'
-                    ),
-                    radios(),
-                  ],
-                ),
-              ),
-            ),
-            Padding(padding: EdgeInsets.symmetric(vertical: 8.0)),
-            RaisedButton(
-              color: color,
-              child: Text('Calculer votre besoin',
-                  textScaleFactor: 1.2, style: TextStyle(color: Colors.white)),
-              onPressed: calculerNombreDeCalories,
-            ),
-          ],
+    if (Platform.isIOS) {
+      print("iOS");
+    } else {
+      print("not iOS");
+    }
+    return GestureDetector(
+      onTap: (() => FocusScope.of(context).requestFocus(new FocusNode())),
+      child: (Platform.isIOS)
+        ? new CupertinoPageScaffold(
+        navigationBar: CupertinoNavigationBar(
+          backgroundColor: color,
+          middle: Text(widget.title),
         ),
+          child: body(),)
+      :Scaffold(
+        appBar: AppBar(
+          title: Text(widget.title),
+          backgroundColor: color,
+        ),
+        body: body(),
       ),
     );
+  }
+
+  Widget body() {
+   return SingleChildScrollView(
+     padding: EdgeInsets.all(15.0),
+     child: Column(
+       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+       children: <Widget>[
+         Container(
+           margin: EdgeInsets.all(8.0),
+           child: Text(
+             'Remplissez tous les champs pour obtenir votre besoin journalier en calories.',
+             textAlign: TextAlign.center,
+           ),
+         ),
+         Card(
+           elevation: 8.0,
+           child: Container(
+             height: MediaQuery
+                 .of(context)
+                 .size
+                 .height * 0.65,
+             width: MediaQuery
+                 .of(context)
+                 .size
+                 .width * 0.9,
+             child: Column(
+               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+               children: <Widget>[
+                 Row(
+                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                   children: <Widget>[
+                     Text(
+                       'Femme',
+                       textAlign: TextAlign.center,
+                       style:
+                       TextStyle(color: (homme) ? Colors.black : color),
+                     ),
+                     switchSelonPlatform(),
+                     Text(
+                       'Homme',
+                       textAlign: TextAlign.center,
+                       style:
+                       TextStyle(color: (homme) ? color : Colors.black),
+                     ),
+                   ],
+                 ),
+                 ageButton(),
+                 Text(
+                   "Votre taille est de ${tailleDouble.floor()}cm.",
+                   textAlign: TextAlign.center,
+                   style: TextStyle(color: color),
+                 ),
+                 sliderSelonPlatform(),
+                 TextField(
+                   keyboardType: TextInputType.number,
+                   onSubmitted: (String string) {
+                     setState(() {
+                       weight = double.parse(string);
+                       submitted = 'Votre poids est de ${string}kg.';
+                     });
+                   },
+                   decoration: InputDecoration(
+                       labelText: 'Entrez votre poids en kilos.'
+                   ),
+                 ),
+                 Text(
+                   submitted ?? '',
+                   style: TextStyle(color: color),
+                 ),
+                 Text(
+                     'Quelle est votre activité sportive ?'
+                 ),
+                 radios(),
+               ],
+             ),
+           ),
+         ),
+         Padding(padding: EdgeInsets.symmetric(vertical: 8.0)),
+         calcButton(),
+       ],
+     ),
+   );
+  }
+
+  Widget calcButton() {
+    if (!Platform.isIOS) {
+      return CupertinoButton(
+        color: color,
+        child: Text('Calculer votre besoin',
+            textScaleFactor: 1.2, style: TextStyle(color: Colors.white)),
+        onPressed: calculerNombreDeCalories,
+      );
+    } else {
+      return RaisedButton(
+        color: color,
+        child: Text('Calculer votre besoin',
+            textScaleFactor: 1.2, style: TextStyle(color: Colors.white)),
+        onPressed: calculerNombreDeCalories,
+      );
+    }
+  }
+
+  Widget ageButton() {
+    if (!Platform.isIOS) {
+      return CupertinoButton(
+        color: color,
+        child: Text(
+          (date == null)
+              ? "Date de naissance"
+              : "Votre âge est de ${yourAge} ans",
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: birthDate,
+      );
+    } else {
+      return RaisedButton(
+        color: color,
+        child: Text(
+          (date == null)
+              ? "Date de naissance"
+              : "Votre âge est de ${yourAge} ans",
+          style: TextStyle(color: Colors.white),
+        ),
+        onPressed: birthDate,
+      );
+    }
+  }
+
+  Widget sliderSelonPlatform() {
+    if (!Platform.isIOS) {
+      return CupertinoSlider(
+        value: tailleDouble,
+        min: 130.0,
+        max: 210.0,
+        activeColor: color,
+        onChanged: (double d) {
+          setState(() {
+            tailleDouble = d;
+          });
+        },
+      );
+    } else {
+      return Slider(
+        value: tailleDouble,
+        min: 130.0,
+        max: 210.0,
+        activeColor: color,
+        onChanged: (double d) {
+          setState(() {
+            tailleDouble = d;
+          });
+        },
+      );
+    }
+  }
+
+  Widget switchSelonPlatform() {
+    if (!Platform.isIOS) {
+      return CupertinoSwitch(
+        value: homme,
+        activeColor: Colors.blue,
+        onChanged: (bool b) {
+          setState(() {
+            homme = b;
+            (homme)
+              ? color = Colors.blue
+              : color = Colors.pink;
+          });
+        }
+      );
+    } else {
+      return Switch(
+        value: homme,
+        activeColor: Colors.blue,
+        inactiveTrackColor: Colors.pink,
+        inactiveThumbColor: Colors.pink,
+        onChanged: (bool b) {
+          setState(() {
+            homme = b;
+            (homme)
+                ? color = Colors.blue
+                : color = Colors.pink;
+          });
+        },
+      );
+    }
   }
 
   Future<Null> birthDate() async {

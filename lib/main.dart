@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       title: 'Calcory',
       theme: ThemeData(
-        primarySwatch: Colors.teal,
+        primarySwatch: color,
       ),
       home: MyHomePage(title: 'Calculez votre besoin journalier'),
     );
@@ -36,16 +36,20 @@ class _MyHomePageState extends State<MyHomePage> {
   int yourAge;
   double tailleDouble = 130.0;
   String submitted;
+  double weight;
   int itemSelectionne;
   List<String> activities = ["Faible", "Modéré", "Forte"];
 
+  // Final result
+  double calories;
 
-  List<Widget> radios() {
+
+  Row radios() {
     List<Widget> l = [];
     for (int x = 0; x < 3; x++) {
-      Row row = new Row(
+      Column col = new Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          Text(activities[x]),
           new Radio(value: x,
               groupValue: itemSelectionne,
               activeColor: color,
@@ -54,11 +58,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   itemSelectionne = i;
                 });
               }),
+          Text(activities[x]),
         ],
       );
-      l.add(row);
+      l.add(col);
     }
-    return l;
+    return new Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: l,
+    );
   }
 
   @override
@@ -66,13 +74,15 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        backgroundColor: color,
       ),
-      body: Center(
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(15.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
             Container(
-              margin: EdgeInsets.symmetric(horizontal: 7.0),
+              margin: EdgeInsets.all(8.0),
               child: Text(
                 'Remplissez tous les champs pour obtenir votre besoin journalier en calories.',
                 textAlign: TextAlign.center,
@@ -81,8 +91,14 @@ class _MyHomePageState extends State<MyHomePage> {
             Card(
               elevation: 8.0,
               child: Container(
-                height: MediaQuery.of(context).size.height * 0.65,
-                width: MediaQuery.of(context).size.width * 0.9,
+                height: MediaQuery
+                    .of(context)
+                    .size
+                    .height * 0.65,
+                width: MediaQuery
+                    .of(context)
+                    .size
+                    .width * 0.9,
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: <Widget>[
@@ -93,7 +109,7 @@ class _MyHomePageState extends State<MyHomePage> {
                           'Femme',
                           textAlign: TextAlign.center,
                           style:
-                              TextStyle(color: (homme) ? Colors.black : color),
+                          TextStyle(color: (homme) ? Colors.black : color),
                         ),
                         Switch(
                           value: homme,
@@ -113,14 +129,16 @@ class _MyHomePageState extends State<MyHomePage> {
                           'Homme',
                           textAlign: TextAlign.center,
                           style:
-                              TextStyle(color: (homme) ? color : Colors.black),
+                          TextStyle(color: (homme) ? color : Colors.black),
                         ),
                       ],
                     ),
                     RaisedButton(
                       color: color,
                       child: Text(
-                        (date == null) ? "Date de naissance" : "Votre âge est de ${yourAge} ans",
+                        (date == null)
+                            ? "Date de naissance"
+                            : "Votre âge est de ${yourAge} ans",
                         style: TextStyle(color: Colors.white),
                       ),
                       onPressed: birthDate,
@@ -145,28 +163,27 @@ class _MyHomePageState extends State<MyHomePage> {
                       keyboardType: TextInputType.number,
                       onSubmitted: (String string) {
                         setState(() {
+                          weight = double.parse(string);
                           submitted = 'Votre poids est de ${string}kg.';
                         });
                       },
                       decoration: InputDecoration(
-                          labelText:'Entrez votre poids en kilos.'
+                          labelText: 'Entrez votre poids en kilos.'
                       ),
                     ),
                     Text(
-                        submitted ?? '',
+                      submitted ?? '',
                       style: TextStyle(color: color),
                     ),
                     Text(
-                      'Quelle est votre activité sportive ?'
+                        'Quelle est votre activité sportive ?'
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: radios(),
-                    ),
+                    radios(),
                   ],
                 ),
               ),
             ),
+            Padding(padding: EdgeInsets.symmetric(vertical: 8.0)),
             RaisedButton(
               color: color,
               child: Text('Calculer votre besoin',
@@ -189,10 +206,86 @@ class _MyHomePageState extends State<MyHomePage> {
     if (choice != null) {
       setState(() {
         date = choice;
-        yourAge = (DateTime.now().difference(date).inDays / 365.25).floor();
+        yourAge = (DateTime
+            .now()
+            .difference(date)
+            .inDays / 365.25).floor();
       });
     }
   }
 
-  Future<Null> calculate() async {}
+  Future<Null> calculate() async {
+    if (homme) {
+      calories = 66.4730 + (13.7516 * weight) + (5.0033 * tailleDouble) -
+          (6.7550 * yourAge);
+      switch (itemSelectionne) {
+        case 0:
+          {
+            calories = calories * 1.2;
+          }
+          break;
+
+        case 1:
+          {
+            calories = calories * 1.5;
+          }
+          break;
+
+        case 2:
+          {
+            calories = calories * 1.8;
+          }
+      }
+      print("Calories : $calories");
+    } else {
+      calories = 65.0955 + (9.5634 * weight) + (1.8496 * tailleDouble) -
+          (4.6756 * yourAge);
+      switch (itemSelectionne) {
+        case 0:
+          {
+            calories = calories * 1.2;
+          }
+          break;
+
+        case 1:
+          {
+            calories = calories * 1.5;
+          }
+          break;
+
+        case 2:
+          {
+            calories = calories * 1.8;
+          }
+      }
+      print("Calories : $calories");
+    }
+
+    return showDialog(context: context,
+        barrierDismissible: true,
+        builder: (BuildContext buildContext) {
+          return AlertDialog(
+            title: Text("Besoin en calories"),
+            contentPadding: EdgeInsets.all(32.0),
+            content: Text(
+              "Votre besoin est de ${calories.floor()} calories.",
+            ),
+            actions: <Widget>[
+              new RaisedButton(
+                color: color,
+                onPressed: (() {
+                  Navigator.pop(buildContext);
+                  //Navigator.pop(context);
+                }),
+                child: Text(
+                  "OK",
+                  textScaleFactor: 1.2,
+                  style: TextStyle(color: Colors.white),
+                ),
+              ),
+            ],
+          );
+        }
+    );
+  }
 }

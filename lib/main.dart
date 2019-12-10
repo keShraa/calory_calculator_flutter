@@ -185,14 +185,14 @@ class _MyHomePageState extends State<MyHomePage> {
       return CupertinoButton(
         color: color,
         child: Text('Calculer votre besoin',
-            textScaleFactor: 1.2, style: TextStyle(color: Colors.white)),
+            textScaleFactor: 1.0, style: TextStyle(color: Colors.white)),
         onPressed: calculerNombreDeCalories,
       );
     } else {
       return RaisedButton(
         color: color,
         child: Text('Calculer votre besoin',
-            textScaleFactor: 1.2, style: TextStyle(color: Colors.white)),
+            textScaleFactor: 1.0, style: TextStyle(color: Colors.white)),
         onPressed: calculerNombreDeCalories,
       );
     }
@@ -205,7 +205,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Text(
           (date == null)
               ? "Date de naissance"
-              : "Votre âge est de ${yourAge} ans",
+              : "Votre âge est de $yourAge ans",
           style: TextStyle(color: Colors.white),
         ),
         onPressed: birthDate,
@@ -216,7 +216,7 @@ class _MyHomePageState extends State<MyHomePage> {
         child: Text(
           (date == null)
               ? "Date de naissance"
-              : "Votre âge est de ${yourAge} ans",
+              : "Votre âge est de $yourAge ans",
           style: TextStyle(color: Colors.white),
         ),
         onPressed: birthDate,
@@ -253,7 +253,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   Widget switchSelonPlatform() {
-    if (!Platform.isIOS) {
+    if (Platform.isIOS) {
       return CupertinoSwitch(
         value: homme,
         activeColor: Colors.blue,
@@ -317,18 +317,33 @@ class _MyHomePageState extends State<MyHomePage> {
         context: context,
       barrierDismissible: false,
       builder: (BuildContext buildContext) {
-          return new AlertDialog(
-            title: Text("Erreur"),
-            content: Text("Tous les champs ne sont pas remplis"),
-            actions: <Widget>[
-              new FlatButton(
+          if (!Platform.isIOS) {
+            return CupertinoAlertDialog(
+              title: Text("Erreur"),
+              content: Text("Tous les champs ne sont pas remplis"),
+              actions: <Widget>[
+                new FlatButton(
                   onPressed: () {
                     Navigator.pop(buildContext);
                   },
                   child: Text("OK", style: TextStyle(color: Colors.red)),
-              ),
-            ],
-          );
+                ),
+              ],
+            );
+          } else {
+            return new AlertDialog(
+              title: Text("Erreur"),
+              content: Text("Tous les champs ne sont pas remplis"),
+              actions: <Widget>[
+                new FlatButton(
+                  onPressed: () {
+                    Navigator.pop(buildContext);
+                  },
+                  child: Text("OK", style: TextStyle(color: Colors.red)),
+                ),
+              ],
+            );
+          }
       }
     );
   }
@@ -383,27 +398,59 @@ class _MyHomePageState extends State<MyHomePage> {
     return showDialog(context: context,
         barrierDismissible: true,
         builder: (BuildContext buildContext) {
-          return AlertDialog(
-            title: Text("Besoin en calories"),
-            contentPadding: EdgeInsets.all(32.0),
-            content: Text(
-              "Votre besoin est de ${calories.floor()} calories.",
-            ),
-            actions: <Widget>[
-              new RaisedButton(
-                color: color,
-                onPressed: (() {
-                  Navigator.pop(buildContext);
-                  //Navigator.pop(context);
-                }),
+          if (!Platform.isIOS) {
+            return CupertinoAlertDialog(
+              title: DefaultTextStyle(
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 15.0,
+                ),
                 child: Text(
-                  "OK",
-                  textScaleFactor: 1.2,
-                  style: TextStyle(color: Colors.white),
+                  "Votre besoin est de ${calories.floor()} calories.",
+                  textAlign: TextAlign.center,
                 ),
               ),
-            ],
-          );
+              actions: <Widget>[
+                new CupertinoButton(
+                  onPressed: (() {
+                    Navigator.pop(buildContext);
+                  }),
+                  child: DefaultTextStyle(
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15.0,
+                    ),
+                    child: Text(
+                      "OK",
+                    textAlign: TextAlign.center,
+                    ),
+                  ),
+                ),
+              ],
+            );
+          } else {
+            return AlertDialog(
+              title: Text("Besoin en calories"),
+              contentPadding: EdgeInsets.all(32.0),
+              content: Text(
+                "Votre besoin est de ${calories.floor()} calories.",
+              ),
+              actions: <Widget>[
+                new RaisedButton(
+                  color: color,
+                  onPressed: (() {
+                    Navigator.pop(buildContext);
+                  }),
+                  child: Text(
+                    "OK",
+                    textScaleFactor: 1.2,
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ],
+            );
+          }
         }
     );
   }

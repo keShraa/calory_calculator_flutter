@@ -188,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
               color: color,
               child: Text('Calculer votre besoin',
                   textScaleFactor: 1.2, style: TextStyle(color: Colors.white)),
-              onPressed: calculate,
+              onPressed: calculerNombreDeCalories,
             ),
           ],
         ),
@@ -212,6 +212,37 @@ class _MyHomePageState extends State<MyHomePage> {
             .inDays / 365.25).floor();
       });
     }
+  }
+
+  void calculerNombreDeCalories() {
+    if (yourAge != null && weight != null && itemSelectionne != null) {
+      // Calculer
+      calculate();
+    } else {
+      // Alerte, pas tous les champs
+      alerte();
+    }
+  }
+
+  Future<Null> alerte() async {
+    return showDialog(
+        context: context,
+      barrierDismissible: false,
+      builder: (BuildContext buildContext) {
+          return new AlertDialog(
+            title: Text("Erreur"),
+            content: Text("Tous les champs ne sont pas remplis"),
+            actions: <Widget>[
+              new FlatButton(
+                  onPressed: () {
+                    Navigator.pop(buildContext);
+                  },
+                  child: Text("OK", style: TextStyle(color: Colors.red)),
+              ),
+            ],
+          );
+      }
+    );
   }
 
   Future<Null> calculate() async {
